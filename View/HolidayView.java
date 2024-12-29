@@ -1,4 +1,4 @@
-package View;
+ package View;
 
 import java.awt.*;
 import java.sql.Connection;
@@ -21,6 +21,7 @@ public class HolidayView extends JPanel{
 	public JButton ajouter = new JButton("Ajouter");
 	public JButton modifier = new JButton("Modifier");
 	public JButton supprimer = new JButton("Supprimer");
+	public JButton exporter = new JButton("Export");
 	JTextField DDebut = new JTextField("yyyy-mm-dd");
 	JTextField DFin = new JTextField("yyyy-mm-dd");
 	public JTable tab=new JTable();
@@ -80,6 +81,7 @@ public class HolidayView extends JPanel{
 		button.add(ajouter);
 		button.add(modifier);
 		button.add(supprimer);
+		button.add(exporter);
 		add(button, BorderLayout.SOUTH);
 		 refreshTable(); 
 		
@@ -125,6 +127,9 @@ public class HolidayView extends JPanel{
 	    return supprimer;
 	}
 	
+	public JButton getexportbut() {
+		return exporter;
+	}
 	
 	public String gettype() {
 		return typeHoliday.getSelectedItem().toString();

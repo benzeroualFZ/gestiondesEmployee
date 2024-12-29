@@ -1,11 +1,18 @@
 package Controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.List;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import Model.Employe;
 import Model.Holiday;
 import Model.HolidayModel;
 import View.HolidayView;
@@ -22,6 +29,7 @@ public class HolidayController {
         viewH.getAddBut().addActionListener(e -> addHoliday());
         viewH.getDeleteBut().addActionListener(e -> deleteHoliday());
         viewH.getUpdateBut().addActionListener(e -> modifyHoliday());
+        viewH.exporter.addActionListener(e -> handleExport());
     }
 
  // Utility method to convert Date to LocalDate
@@ -207,4 +215,31 @@ public class HolidayController {
             viewH.showMessage("Erreur lors de la suppression du congé.");
         }
     }
+    
+    private void handleExport() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Fichiers CSV", "csv"));
+
+        if (fileChooser.showSaveDialog(viewH) == JFileChooser.APPROVE_OPTION) {
+            try {
+                String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                if (!filePath.toLowerCase().endsWith(".txt")) {
+                    filePath += ".txt";
+                }
+
+                // Récupérer uniquement les employés ayant des congés
+                List<Employe> employeesWithHolidays = modelH.findEmployeesWithHolidaysDetailed();
+
+                // Exporter les données
+                modelH.exportData(filePath, employeesWithHolidays);
+
+                JOptionPane.showMessageDialog(viewH, "Exportation réussie !");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(viewH, "Erreur lors de l'exportation : " + ex.getMessage());
+            }
+        }
+    }
+
+
 }

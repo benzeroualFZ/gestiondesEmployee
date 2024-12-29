@@ -11,7 +11,7 @@ public class Employe {
 	private int salaire;
 	private ROLE role;
 	private POSTE poste;
-	public int Holiday;
+	public Holiday holiday;
 	
 	public Employe(int id_empl,String nom,String prenom,int tel,int salaire, String email,ROLE role,POSTE poste){
 		this.id_empl = id_empl;
@@ -22,7 +22,7 @@ public class Employe {
 		this.salaire = salaire;
 		this.poste= poste;
 		this.role=role;
-		this.Holiday=25;
+	     this.holiday = holiday; 
 	}
 	public Employe(String nom, String prenom, int tel, int salaire, String email, ROLE role, POSTE poste) {
 	    this.nom = nom;
@@ -32,7 +32,7 @@ public class Employe {
 	    this.salaire = salaire;
 	    this.role = role;
 	    this.poste = poste;
-	    this.Holiday=25;
+	     this.holiday = holiday; 
 	}
 
 	public enum ROLE {
@@ -81,11 +81,11 @@ public class Employe {
 		return poste;
 	}
 	
-	public int getHoliday() {
-		return Holiday;
+	public Holiday getHoliday() {
+		return holiday;
 	}
 	  
-    public void setHoliday(int Holiday) {
-        this.Holiday = Holiday;
+    public void setHoliday(Holiday Holiday) {
+        this.holiday = Holiday;
     }
 }

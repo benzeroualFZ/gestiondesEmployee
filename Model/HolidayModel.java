@@ -1,9 +1,11 @@
 package Model;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import DAO.DBconnection;
 import DAO.HolidayDAOImpl;
@@ -41,9 +43,18 @@ public class HolidayModel {
         }
     }
 
+    public void exportData(String fileName, List<Employe> data) throws IOException {
+		 dao.exportData(fileName, data);
+	 }
+		 
+    public List<Employe> findEmployeesWithHolidaysDetailed(){
+    	return dao.findEmployeesWithHolidaysDetailed();
+    }
 
-
-
+    public List<Holiday> findAll() {
+		 return dao.findAll();
+	 }
+    
     
     public ArrayList<Holiday> getAllHolidays() {
         return dao.getAllHolidays(); 

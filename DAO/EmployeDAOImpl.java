@@ -1,5 +1,11 @@
 package DAO;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +17,7 @@ import Model.Employe;
 import Model.Employe.POSTE;
 import Model.Employe.ROLE;
 
-public class EmployeDAOImpl implements GenericDAOI<Employe>{
+public class EmployeDAOImpl implements GenericDAOI<Employe>, DataImportExport<Employe>{
 private Connection conn;
 
 	
@@ -279,16 +285,102 @@ private Connection conn;
 	        }
 	        return null;
 	    }
+	    
+	    
+	    
+	    @Override
+	    public void importData(String fileName) throws IOException {
+			String sql = "Insert into employee (nom, prenom, email, tel, role, poste, salaire) values (?,?,?,?,?,?,?)";
+			try(BufferedReader reader = new BufferedReader(new FileReader(fileName)); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				
+				String line = reader.readLine();
+				while((line = reader.readLine()) != null) {
+					String[] data = line.split(",");
+					if(data.length == 7) {
+						pstmt.setString(1, data[0].trim());
+						pstmt.setString(2, data[1].trim());
+						pstmt.setString(3, data[2].trim());
+						pstmt.setString(4, data[3].trim());
+						pstmt.setString(5, data[4].trim());
+						pstmt.setString(6, data[5].trim());
+						pstmt.setString(7, data[6].trim());
+						pstmt.addBatch();
+					
 
+					}
+				}
+				pstmt.executeBatch();
+				System.out.println("Employees imported successfully!");			
+			} catch (IOException | SQLException e) {
+				e.printStackTrace();	
+			}
+		}
+	    	
+	    
+	@Override
+	public void exportData(String fileName, List<Employe> data) throws IOException {
+		try(BufferedWriter write= new BufferedWriter(new FileWriter(fileName))){
+			write.write("First Name,Last Name,Email,Phone,Role,Poste,Salaire");
+			write.newLine();
+			for(Employe employe :data) {
+				String line = String.format("%s,%s,%s,%s,%s,%s,%d",
+						employe.getPrenom(),
+						employe.getNom(),
+						employe.getEmail(),
+						employe.gettel(),
+						employe.getRole(),
+						employe.getPoste(),
+						employe.getSalaire()
+						);
+				write.write(line);
+				write.newLine();
+			}
+			
+			
+		}
+		
+	}
 	
 	@Override
 	public List<Employe> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		 List<Employe> employes = new ArrayList<>();
+		    String sql = "SELECT e.nom, e.prenom, e.tel, e.salaire, e.email, " +
+		                 "r.nom_role AS role_name, p.nom_poste AS poste_name " +
+		                 "FROM employee e " +
+		                 "JOIN poste p ON e.poste = p.id_poste " +
+		                 "JOIN role r ON e.role = r.id_role";
+
+		    try (PreparedStatement stmt = conn.prepareStatement(sql);
+		         ResultSet rs = stmt.executeQuery()) {
+
+		        while (rs.next()) {
+		            try {
+		                Employe employe = new Employe(
+		                    rs.getString("nom"),
+		                    rs.getString("prenom"),
+		                    rs.getInt("tel"),
+		                    rs.getInt("salaire"),
+		                    rs.getString("email"),
+		                    ROLE.valueOf(rs.getString("role_name").toUpperCase()),
+		                    POSTE.valueOf(rs.getString("poste_name").toUpperCase())
+		                );
+		                employes.add(employe);
+		            } catch (IllegalArgumentException e) {
+		                System.err.println("Invalid role or poste in database: " + e.getMessage());
+		            }
+		        }
+
+		    } catch (SQLException e) {
+		        e.printStackTrace(); 
+		    }
+		return employes;
 	}
+
+
 
 
 
 
 	
 }
+

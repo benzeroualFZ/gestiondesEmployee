@@ -1,5 +1,8 @@
 package DAO;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -8,9 +11,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Model.Employe;
 import Model.Holiday;
+import Model.Employe.POSTE;
+import Model.Employe.ROLE;
 
-public class HolidayDAOImpl implements GenericDAOI<Holiday> {
+public class HolidayDAOImpl implements GenericDAOI<Holiday>, DataImportExport<Employe>{
     private Connection conn;
 
     public HolidayDAOImpl() {
@@ -283,4 +289,134 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
 
         return holidays;
     }
+    
+    public Holiday.Type getHolidayTypeFromInt(int typeValue) {
+        switch (typeValue) {
+            case 0:
+                return Holiday.Type.PAYE;
+            case 1:
+                return Holiday.Type.NON_PAYE;
+            case 2:
+                return Holiday.Type.MALADIE;
+            default:
+                throw new IllegalArgumentException("Unknown holiday type: " + typeValue);
+        }
+    }
+
+    public static Employe.ROLE getRoleFromInt(int roleValue) {
+        switch (roleValue) {
+            case 1:
+                return Employe.ROLE.ADMIN;   
+            case 2:
+                return Employe.ROLE.EMPLOYEE;    
+                 default:
+                throw new IllegalArgumentException("Unknown role: " + roleValue);
+        }
+    }
+    
+    public static Employe.POSTE getPosteFromInt(int posteValue) {
+        switch (posteValue) {
+            case 3:
+                return Employe.POSTE.PILOTE;   
+            case 2:
+                return Employe.POSTE.TEAM_LEADER;   
+            case 1:
+                return Employe.POSTE.INGENIEUR_ETUDE_ET_DEVELOPPEMENT;      
+             
+                 default:
+                throw new IllegalArgumentException("Unknown role: " + posteValue);
+        }
+    }
+
+    
+    public List<Employe> findEmployeesWithHolidaysDetailed() {
+        String sql = """
+            SELECT 
+                e.nom AS employee_nom, 
+                e.prenom AS employee_prenom, 
+                e.email AS employee_email, 
+                e.tel AS employee_tel, 
+                e.role AS employee_role, 
+                e.poste AS employee_poste, 
+                e.salaire AS employee_salaire,
+                h.DDebut AS holiday_start_date, 
+                h.DFin AS holiday_end_date, 
+                h.type AS holiday_type,
+                e.id_empl AS employee_id
+            FROM employee e
+            INNER JOIN holiday h ON e.id_empl = h.id_empl
+        """;
+
+        List<Employe> results = new ArrayList<>();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Créer l'objet Holiday pour l'employé
+                Holiday holiday = new Holiday(
+                    rs.getDate("holiday_start_date"),
+                    rs.getDate("holiday_end_date"),
+                    getHolidayTypeFromInt(rs.getInt("holiday_type")),
+                    rs.getInt("employee_id")
+                );
+                
+                // Créer l'objet Employe
+                Employe employe = new Employe(
+                    rs.getString("employee_prenom"),
+                    rs.getString("employee_nom"),
+                    rs.getInt("employee_tel"),
+                    rs.getInt("employee_salaire"),
+                    rs.getString("employee_email"),
+                    getRoleFromInt(rs.getInt("employee_role")),
+                    getPosteFromInt(rs.getInt("employee_poste"))
+                );
+                
+                employe.setHoliday(holiday);
+                results.add(employe);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    
+    @Override
+    public void exportData(String fileName, List<Employe> data) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+          
+            writer.write("Nom,Prenom,Email,Tel,Role,Poste,Salaire,Holiday Start,Holiday End,Holiday Type");
+            writer.newLine();
+
+            for (Employe employe : data) {
+                Holiday holiday = employe.getHoliday(); 
+
+                String line = String.format("%s,%s,%s,%s,%s,%s,%d,%s,%s,%s",
+                    employe.getNom(),
+                    employe.getPrenom(),
+                    employe.getEmail(),
+                    employe.gettel(),
+                    employe.getRole(),
+                    employe.getPoste(),
+                    employe.getSalaire(),
+                    holiday.getDDebut(),
+                    holiday.getDFin(),
+                    holiday.getType()
+                );
+
+                writer.write(line);
+                writer.newLine();
+            }
+        }
+    }
+
+
+	@Override
+	public void importData(String fileName) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

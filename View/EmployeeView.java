@@ -20,6 +20,8 @@ public class EmployeeView extends JPanel{
 	public JButton modifier = new JButton("Modifier");
 	public JButton supprimer = new JButton("Supprimer");
 	public JButton afficher = new JButton("Afficher");
+	public JButton export = new JButton("Export");
+	public JButton imp = new JButton("Import");
 	JTextField nom = new JTextField(20);
 	JTextField prenom = new JTextField(20);
 	JTextField email = new JTextField(20);
@@ -89,6 +91,8 @@ public class EmployeeView extends JPanel{
 		button.add(modifier);
 		button.add(supprimer);
 		button.add(afficher);
+		button.add(export);
+		button.add(imp);
 		
 		add(button, BorderLayout.SOUTH);
 					
@@ -133,6 +137,14 @@ public class EmployeeView extends JPanel{
 	
 	public JButton getListButton() {
 	    return afficher;
+	}
+	
+	public JButton getimportbutton() {
+	    return imp;
+	}
+		
+	public JButton getExportButton() {
+	    return export;
 	}
 		
 		

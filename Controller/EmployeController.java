@@ -1,6 +1,11 @@
 package Controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import DAO.EmployeDAOImpl;
 import Model.Employe;
@@ -27,6 +32,8 @@ public class EmployeController {
 		this.view.modifier.addActionListener(e ->updateEmployee());
 		this.view.supprimer.addActionListener(e -> deleteemployee());
 		this.view.afficher.addActionListener(e -> showEmployes());
+		this.view.export.addActionListener(e -> handleExport());
+		this.view.imp.addActionListener(e -> handleImport());
 	}
 	private void addemployee() {
 	   
@@ -121,5 +128,37 @@ public class EmployeController {
 	    }
 	}
 
+	private void handleImport() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Fichiers CSV", "txt"));
+		
+		if(fileChooser.showOpenDialog(view) == JFileChooser.APPROVE_OPTION) {
+			try {
+				String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+				model.ImportData(filePath);
+			}catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	private void handleExport() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Fichiers CSV", "csv"));
+		
+		if(fileChooser.showSaveDialog(view) == JFileChooser.APPROVE_OPTION) {
+			try {
+				String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+				if (!filePath.toLowerCase().endsWith(".txt")) {
+					filePath += ".txt";
+				}
+				List<Employe> employe =model.findAll();
+				model.exportData(filePath, employe);
+				
+			}catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 
 }
