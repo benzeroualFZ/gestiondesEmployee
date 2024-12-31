@@ -89,6 +89,39 @@ public class HolidayView extends JPanel{
 		
 	}
 	
+	  // This method configures the views based on the role
+    public void configureForRole(String role) {
+        if ("EMPLOYEE".equals(role)) {
+            // For Employee, hide most buttons
+            hideAdminAndManagerButtons();
+        } else if ("MANAGER".equals(role)) {
+            // For Manager, show all buttons, but maybe limit some functionality
+            showAllButtons();
+        } else if ("ADMIN".equals(role)) {
+            // For Admin, show all buttons and give full access
+            showAllButtons();
+        } else {
+            hideAdminAndManagerButtons();
+        }
+    }
+    
+    
+
+    private void hideAdminAndManagerButtons() {
+        getAddBut().setVisible(false);
+       getUpdateBut().setVisible(false);
+       getDeleteBut().setVisible(false);
+       getexportbut().setVisible(false);
+    }
+
+
+    private void showAllButtons() {
+       getAddBut().setVisible(true);
+       getUpdateBut().setVisible(true);
+       getDeleteBut().setVisible(true);
+       getexportbut().setVisible(true);
+    }
+	
 	public void refreshTable() {
 	    // Fetch holiday data from DAO
 	    ArrayList<Holiday> holidays = dao.getAllHolidays();  // Assuming this method returns a list of holidays

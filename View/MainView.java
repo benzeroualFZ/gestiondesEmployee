@@ -13,6 +13,8 @@ public class MainView extends JFrame {
         
         setTitle("Gestion des Employés et Congés");
         setSize(800, 600); 
+
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -23,5 +25,16 @@ public class MainView extends JFrame {
         add(tabbedPane, BorderLayout.CENTER);
 
         setVisible(true);
+    }
+    // This method configures the views based on the role
+    public void configureForRole(String role) {
+        // Configure the EmployeeView based on role
+        // You can call configureForRole on EmployeeView
+        // Same for HolidayView
+        EmployeeView employeeView = (EmployeeView) tabbedPane.getComponentAt(0);
+        HolidayView holidayView = (HolidayView) tabbedPane.getComponentAt(1);
+
+        employeeView.configureForRole(role);
+        holidayView.configureForRole(role);
     }
 }

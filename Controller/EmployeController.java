@@ -14,6 +14,7 @@ import Model.Employe;
 import Model.Employe.POSTE;
 import Model.Employe.ROLE;
 import Model.EmployeModel;
+import View.CreateUserDialog;
 import View.EmployeeView;
 
 public class EmployeController {
@@ -34,6 +35,7 @@ public class EmployeController {
 		this.view.afficher.addActionListener(e -> showEmployes());
 		this.view.export.addActionListener(e -> handleExport());
 		this.view.imp.addActionListener(e -> handleImport());
+		 this.view.creat.addActionListener(e -> showCreateUserDialog());
 	}
 	private void addemployee() {
 	   
@@ -160,5 +162,13 @@ public class EmployeController {
 			}
 		}
 	}
+	
+	   private void showCreateUserDialog() {
+	        // Get the selected employee name
+	        String employeeName = view.getNom().getText();  // You can also get employee name from a selected row in the table
+
+	        // Create a new dialog for entering username and password
+	        new CreateUserDialog();
+	    }
 
 }

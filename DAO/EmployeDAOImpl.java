@@ -375,9 +375,47 @@ private Connection conn;
 		    }
 		return employes;
 	}
+	
+	public ArrayList<String> getEmployeeNames() {
+        ArrayList<String> employee = new ArrayList<>();
+        String sql = "SELECT CONCAT(nom, ' ', prenom) AS nom_prenom FROM employee";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                employee.add(rs.getString("nom_prenom"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employee;
+    }
 
 
+	  // Method to save username and hashed password for an employee
+    public void saveUserCredentials(String employeeName, String username, String hashedPassword) {
+        // Query to insert the username and hashed password into the users table
+        String query = "INSERT INTO users (username, password_hash, role_id, emp_id) " +
+                       "SELECT ?, ?, r.id_role, e.id_empl FROM employee e " +
+                       "JOIN role r ON e.role = r.id_role " +
+                       "WHERE CONCAT(e.nom, ' ', e.prenom) = ?";
 
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the parameters for the query
+            stmt.setString(1, username);
+            stmt.setString(2, hashedPassword);
+            stmt.setString(3, employeeName);
+
+            // Execute the update
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Credentials saved for employee: " + employeeName);
+            } else {
+                System.out.println("Employee not found for username assignment.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 

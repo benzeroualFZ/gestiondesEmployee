@@ -22,6 +22,8 @@ public class EmployeeView extends JPanel{
 	public JButton afficher = new JButton("Afficher");
 	public JButton export = new JButton("Export");
 	public JButton imp = new JButton("Import");
+	public JButton creat = new JButton("creation d'un compte");
+	
 	JTextField nom = new JTextField(20);
 	JTextField prenom = new JTextField(20);
 	JTextField email = new JTextField(20);
@@ -93,12 +95,49 @@ public class EmployeeView extends JPanel{
 		button.add(afficher);
 		button.add(export);
 		button.add(imp);
+		button.add(creat);
 		
 		add(button, BorderLayout.SOUTH);
 					
 	}
 	
+	
+	 // This method configures the views based on the role
+    public void configureForRole(String role) {
+        if ("EMPLOYEE".equals(role)) {
+            // For Employee, hide most buttons
+            hideAdminAndManagerButtons();
+        } else if ("MANAGER".equals(role)) {
+            // For Manager, show all buttons, but maybe limit some functionality
+            showAllButtons();
+        } else if ("ADMIN".equals(role)) {
+            // For Admin, show all buttons and give full access
+            showAllButtons();
+        } else {
+            hideAdminAndManagerButtons();
+        }
+    }
+    
+    private void hideAdminAndManagerButtons() {
+        getAddButton().setVisible(false);
+       getUpdateButton().setVisible(false);
+        getDeleteButton().setVisible(false);
+        getExportButton().setVisible(false);
+        getimportbutton().setVisible(false);
+       getcreation().setVisible(false);
+        
+    }
 
+
+    private void showAllButtons() {
+        getAddButton().setVisible(true);
+        getUpdateButton().setVisible(true);
+        getDeleteButton().setVisible(true);
+       getExportButton().setVisible(true);
+        getimportbutton().setVisible(true);
+        getcreation().setVisible(true);
+        
+    }
 
 		public void refreshTable() {
 		    Object[][] employes = dao.getEmployes();  // Récupérer les valeurs des employés
@@ -147,6 +186,9 @@ public class EmployeeView extends JPanel{
 	    return export;
 	}
 		
+	public JButton getcreation() {
+		return creat;
+	}
 		
 		public JTextField getNom() {
 			return nom;
